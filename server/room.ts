@@ -6,15 +6,12 @@ function getActiveRooms(
 ) {
   const activeRooms: any = [];
 
-  Object.keys(io.sockets.adapter.rooms).forEach((room) => {
-    let isRoom = true;
-    Object.keys(io.sockets.adapter.sids).forEach((sid) => {
-      isRoom = sid === room ? false : isRoom;
-    });
-    if (isRoom) activeRooms.push(room);
+  Array.from(io.sockets.adapter.rooms.keys()).forEach((room) => {
+    let isRoom = !Array.from(io.sockets.adapter.sids.keys()).includes(room);
+    if (isRoom) {
+      activeRooms.push(room);
+    }
   });
-
-  console.log(activeRooms);
 
   return activeRooms;
 }

@@ -5,6 +5,7 @@ import cors from "cors";
 import socketIO from "socket.io";
 import { router } from "./router";
 import { getActiveRooms } from "./room";
+import { addUser, removeUser, getAllUsers, userExists } from "./user";
 
 dotenv.config();
 
@@ -26,18 +27,26 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
+    removeUser(socket.id);
   });
 
-  socket.on("wantsToJoin", (roomName) => {
-    console.log("R", roomName);
-    socket.join(roomName);
-    console.log(socket.rooms);
-    console.log(io.sockets.adapter.rooms);
+  socket.on("wantsToJoin", (name, room) => {
+    const { user } = addUser({ id: socket.id, name, room });
+    console.log(getAllUsers());
+    socket.join(room);
   });
 
-  socket.on("checkIfRoomExists", ({ roomName }, callbackFn) => {
+  socket.on("checkIfRoomExists", (roomName, callbackFn) => {
     const rooms = getActiveRooms(io);
     return callbackFn(rooms.includes(roomName));
+  });
+
+  socket.on("checkUser", (name, room, callback) => {
+    const { error } = userExists(name, room);
+    if (error) {
+      return callback(error);
+    }
+    return callback();
   });
 });
 

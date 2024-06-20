@@ -6,7 +6,7 @@ export default function Homepage() {
 
   const joinRoom = () => {
     const randomRoomURI = encodeURIComponent("abc");
-    navigate(`/room/${randomRoomURI}`);
+    navigate(`/join?room=${randomRoomURI}&create=true`);
   };
 
   return (

@@ -1,61 +1,23 @@
-import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { socket } from "../../utils/socketInit";
+import JoinNamePrompt from "./JoinNamePrompt";
 
 export default function Join() {
   const navigate = useNavigate();
+
   const [searchParams] = useSearchParams();
+  const createSearchParam = searchParams.get("create");
+  const roomSearchParam = searchParams.get("room");
 
-  const [nameValue, setNameValue] = useState("");
+  const name = localStorage.getItem("name");
 
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const tryToJoin = () => {
-    console.log("nv", nameValue);
-    if (nameValue === "" || !nameValue) {
-      setErrorMessage("name can't be empty!");
-      return;
+  if (name != null && name !== "") {
+    if (createSearchParam === "true") {
+      navigate(`/room/${roomSearchParam}?create=${createSearchParam}`);
+    } else {
+      navigate(`/room/${roomSearchParam}`);
     }
+    return;
+  }
 
-    localStorage.setItem("name", JSON.stringify(nameValue));
-
-    socket.emit(
-      "checkUser",
-      nameValue,
-      searchParams.get("room"),
-      (error: string) => {
-        if (error) {
-          setErrorMessage(error);
-        } else {
-          navigate(`/room/${searchParams.get("room")}`);
-        }
-      }
-    );
-  };
-
-  return (
-    <div>
-      <p>tell us your name before joining</p>
-      <div>
-        <input
-          value={nameValue}
-          onChange={(e) => {
-            setNameValue(e.target.value);
-          }}
-          type="text"
-          name="name"
-          id="name"
-          required
-        />
-        <button
-          onClick={() => {
-            tryToJoin();
-          }}
-        >
-          proceed
-        </button>
-        <p>{errorMessage}</p>
-      </div>
-    </div>
-  );
+  return <JoinNamePrompt></JoinNamePrompt>;
 }

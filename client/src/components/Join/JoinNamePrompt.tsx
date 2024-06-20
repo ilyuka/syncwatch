@@ -20,9 +20,11 @@ export default function JoinNamePrompt() {
     localStorage.setItem("name", JSON.stringify(nameValue));
 
     if (createSearchParam === "true") {
-      navigate(`/room/${roomSearchParam}?create=${createSearchParam}`);
+      navigate(`/room/${roomSearchParam}?create=${createSearchParam}`, {
+        replace: true,
+      });
     } else {
-      navigate(`/room/${roomSearchParam}`);
+      navigate(`/room/${roomSearchParam}`, { replace: true });
     }
   };
 

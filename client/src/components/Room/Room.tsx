@@ -1,18 +1,37 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 
 export default function Room() {
   const navigate = useNavigate();
   const params = useParams();
+  const [searchParams] = useSearchParams();
+
+  const createSearchParam = searchParams.get("create");
+  const roomNameParam = params.roomName;
+
+  // useEffect(() => {
+  //   if (!roomNameParam) {
+  //     navigate("/");
+  //   }
+  // }, []);
+
+  // useEffect(() => {
+  //   if (createSearchParam !== "true") {
+  //     socket.emit("checkIfRoomExists", roomNameParam, (exists: boolean) => {
+  //       if (!exists) {
+  //         navigate("/");
+  //         return;
+  //       }
+  //     });
+  //   }
+  // }, []);
+
+  return <div>room</div>;
 
   const [room, setRoom] = useState(params.roomName);
 
   let passedAllChecks = true;
-
-  if (!params.roomName) {
-    navigate("/");
-  }
 
   useEffect(() => {
     const localStorageUsername = localStorage.getItem("name");

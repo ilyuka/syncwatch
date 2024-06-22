@@ -30,7 +30,7 @@ io.on("connection", (socket) => {
     removeUser(socket.id);
   });
 
-  socket.on("wantsToJoin", (name, room) => {
+  socket.on("join", (name, room) => {
     const { user } = addUser({ id: socket.id, name, room });
     console.log(getAllUsers());
     socket.join(room);

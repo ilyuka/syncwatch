@@ -1,13 +1,8 @@
-import { useState, useEffect } from "react";
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-  redirect,
-} from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 
-export default function Room() {
+export default function RoomEnter() {
   const navigate = useNavigate();
   const params = useParams();
   const [searchParams] = useSearchParams();
@@ -16,22 +11,34 @@ export default function Room() {
   const roomNameParam = params.roomName;
 
   const name = localStorage.getItem("name");
-  // useEffect(() => {
-  //   if (!roomNameParam) {
-  //     navigate("/");
-  //   }
-  // }, []);
 
-  // useEffect(() => {
-  //   if (createSearchParam !== "true") {
-  //     socket.emit("checkIfRoomExists", roomNameParam, (exists: boolean) => {
-  //       if (!exists) {
-  //         navigate("/");
-  //         return;
-  //       }
-  //     });
-  //   }
-  // }, []);
+  const stoppedRef = useRef(false);
+
+  // check if room exists, but only if '?create' is not true
+  useEffect(() => {
+    if (roomNameParam && createSearchParam !== "true") {
+      socket.emit("checkIfRoomExists", roomNameParam, (exists: boolean) => {
+        if (!exists) {
+          stoppedRef.current = true;
+          navigate("/", {
+            state: {
+              message: `Seems like room '${decodeURIComponent(
+                roomNameParam
+              )}' doesnt exist, check if your link is valid.`,
+            },
+          });
+        }
+      });
+    }
+  }, []);
+
+  // check if user with same username is in the room
+  /* could be same name and same socket.id (in case of client js navigation) */
+  useEffect(() => {
+    if (stoppedRef.current) {
+      return;
+    }
+  }, []);
 
   return <div>room</div>;
 

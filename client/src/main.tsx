@@ -5,7 +5,7 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import Homepage from "./components/Homepage/Homepage.tsx";
-import Room from "./components/Room/Room.tsx";
+import RoomEnter from "./components/Room/RoomEnter.tsx";
 import "./index.css";
 import Join from "./components/Join/Join.tsx";
 
@@ -16,7 +16,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/room/:roomName",
-    element: <Room></Room>,
+    element: <RoomEnter></RoomEnter>,
     loader({ request, params }) {
       const url = new URL(request.url);
       const name = localStorage.getItem("name");

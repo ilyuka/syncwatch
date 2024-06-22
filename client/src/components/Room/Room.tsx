@@ -16,15 +16,6 @@ export default function Room() {
   const roomNameParam = params.roomName;
 
   const name = localStorage.getItem("name");
-
-  if (!name || name === null) {
-    if (createSearchParam === "true") {
-      return redirect(`/join?room=${roomNameParam}?create=true`);
-    } else {
-      return redirect(`/join?room=${roomNameParam}`);
-    }
-  }
-
   // useEffect(() => {
   //   if (!roomNameParam) {
   //     navigate("/");

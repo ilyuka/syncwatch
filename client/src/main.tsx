@@ -18,6 +18,18 @@ const router = createBrowserRouter([
     path: "/room/:roomName",
     element: <Room></Room>,
     loader({ request, params }) {
+      const url = new URL(request.url);
+      const name = localStorage.getItem("name");
+      const create = url.searchParams.get("create");
+      const room = params.roomName;
+
+      if (name == null || name === "") {
+        if (create === "true") {
+          return redirect(`/join?room=${room}?create=true`);
+        } else {
+          return redirect(`/join?room=${room}`);
+        }
+      }
       return null;
     },
   },

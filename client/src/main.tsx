@@ -25,7 +25,7 @@ const router = createBrowserRouter([
 
       if (name == null || name === "") {
         if (create === "true") {
-          return redirect(`/join?room=${room}?create=true`);
+          return redirect(`/join?room=${room}&create=true`);
         } else {
           return redirect(`/join?room=${room}`);
         }

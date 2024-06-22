@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 
 export default function JoinNamePrompt() {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [searchParams] = useSearchParams();
   const createSearchParam = searchParams.get("create");
@@ -10,6 +11,10 @@ export default function JoinNamePrompt() {
 
   const [nameValue, setNameValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const [locationMessage, setLocationMessage] = useState(
+    location.state?.message
+  );
 
   const handleSubmit = () => {
     if (!nameValue || nameValue.trim() === "") {
@@ -30,6 +35,7 @@ export default function JoinNamePrompt() {
 
   return (
     <div>
+      <p>{locationMessage && locationMessage}</p>
       <p>tell us your name before joining</p>
       <div>
         <input

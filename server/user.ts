@@ -33,7 +33,7 @@ const userExists = (name: string, room: string) => {
   });
 
   if (duplicateUser) {
-    return { error: "User is already in the room" };
+    return { error: "Your nickname is taken, please try something else." };
   }
   return {};
 };

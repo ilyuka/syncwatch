@@ -13,12 +13,28 @@ export default function RoomEnter() {
   const name = localStorage.getItem("name");
 
   const stoppedRef = useRef(false);
+  useEffect(() => {
+    if (stoppedRef.current) {
+      return;
+    }
+    if (name == null || name === "") {
+      console.log("here");
+      stoppedRef.current = true;
+      navigate(
+        `/join?room=${roomNameParam}${createSearchParam ? "&create=true" : ""}`
+      );
+    }
+  }, [createSearchParam, name, navigate, roomNameParam]);
 
   // check if room exists, but only if '?create' is not true
   useEffect(() => {
+    if (stoppedRef.current) {
+      return;
+    }
     if (roomNameParam && createSearchParam !== "true") {
       socket.emit("checkIfRoomExists", roomNameParam, (exists: boolean) => {
         if (!exists) {
+          console.log("exists", exists);
           stoppedRef.current = true;
           navigate("/", {
             state: {
@@ -30,15 +46,26 @@ export default function RoomEnter() {
         }
       });
     }
-  }, []);
+  }, [createSearchParam, roomNameParam, navigate]);
 
   // check if user with same username is in the room
-  /* could be same name and same socket.id (in case of client js navigation) */
+  /* TODO: could be same name and same socket.id (in case of client js navigation socket connection does not drop???) */
   useEffect(() => {
     if (stoppedRef.current) {
       return;
     }
-  }, []);
+    socket.emit("checkUser", name, roomNameParam, (error?: string) => {
+      if (error) {
+        console.log("error", error);
+        stoppedRef.current = true;
+        navigate(`/join?room=${roomNameParam}`, {
+          state: {
+            message: error,
+          },
+        });
+      }
+    });
+  }, [name, navigate, roomNameParam]);
 
   return <div>room</div>;
 

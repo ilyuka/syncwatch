@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams, useSearchParams } from "react-router-dom";
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+  redirect,
+} from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 
 export default function Room() {
@@ -9,6 +14,16 @@ export default function Room() {
 
   const createSearchParam = searchParams.get("create");
   const roomNameParam = params.roomName;
+
+  const name = localStorage.getItem("name");
+
+  if (!name || name === null) {
+    if (createSearchParam === "true") {
+      return redirect(`/join?room=${roomNameParam}?create=true`);
+    } else {
+      return redirect(`/join?room=${roomNameParam}`);
+    }
+  }
 
   // useEffect(() => {
   //   if (!roomNameParam) {

@@ -23,13 +23,13 @@ const router = createBrowserRouter([
       const create = url.searchParams.get("create");
       const room = params.roomName;
 
-      if (name == null || name === "") {
-        if (create === "true") {
-          return redirect(`/join?room=${room}&create=true`);
-        } else {
-          return redirect(`/join?room=${room}`);
-        }
-      }
+      // if (name == null || name === "") {
+      //   if (create === "true") {
+      //     return redirect(`/join?room=${room}&create=true`);
+      //   } else {
+      //     return redirect(`/join?room=${room}`);
+      //   }
+      // }
       return null;
     },
   },
@@ -42,13 +42,13 @@ const router = createBrowserRouter([
       const create = url.searchParams.get("create");
       const room = url.searchParams.get("room");
 
-      if (name != null && name !== "") {
-        if (create === "true") {
-          return redirect(`/room/${room}?create=true`);
-        } else {
-          return redirect(`/room/${room}`);
-        }
-      }
+      // if (name != null && name !== "") {
+      //   if (create === "true") {
+      //     return redirect(`/room/${room}?create=true`);
+      //   } else {
+      //     return redirect(`/room/${room}`);
+      //   }
+      // }
       return null;
     },
   },

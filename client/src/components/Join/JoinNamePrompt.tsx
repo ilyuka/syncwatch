@@ -22,7 +22,7 @@ export default function JoinNamePrompt() {
       return;
     }
 
-    localStorage.setItem("name", JSON.stringify(nameValue));
+    localStorage.setItem("name", nameValue);
 
     if (createSearchParam === "true") {
       navigate(`/room/${roomSearchParam}?create=${createSearchParam}`, {

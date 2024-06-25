@@ -33,9 +33,9 @@ const userExists = (name: string, room: string) => {
   });
 
   if (duplicateUser) {
-    return { error: "Your nickname is taken, please try something else." };
+    return true;
   }
-  return {};
+  return false;
 };
 
 export { addUser, removeUser, getAllUsers, userExists };

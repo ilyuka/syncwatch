@@ -37,16 +37,14 @@ io.on("connection", (socket) => {
   });
 
   socket.on("checkIfRoomExists", (roomName, callbackFn) => {
+    console.log("checking if room exists");
     const rooms = getActiveRooms(io);
     return callbackFn(rooms.includes(roomName));
   });
 
   socket.on("checkUser", (name, room, callback) => {
-    const { error } = userExists(name, room);
-    if (error) {
-      return callback(error);
-    }
-    return callback();
+    const exists = userExists(name, room);
+    return callback(exists);
   });
 });
 

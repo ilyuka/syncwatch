@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 import Room from "./Room";
@@ -13,64 +13,86 @@ export default function RoomEnter() {
 
   const name = localStorage.getItem("name");
 
+  const [isChecking, setIsChecking] = useState(false);
+
+  const [displayMessage, setDisplayMessage] =
+    useState<string>("please wait...");
+
   console.log("room enter mounted");
-  let stopped = false;
+
   useEffect(() => {
-    if (stopped) {
-      return;
+    function hasCorrectParams(
+      name: string | null,
+      roomName: string | undefined
+    ) {
+      if (name == null || name === "") {
+        return false;
+      }
+      if (roomName == null || roomName === "") {
+        return false;
+      }
+      return true;
     }
-    if (name == null || name === "") {
-      console.log("here2");
-      stopped = true;
+    setIsChecking(true);
+    if (!hasCorrectParams(name, roomNameParam)) {
       navigate(
         `/join?room=${roomNameParam}${createSearchParam ? "&create=true" : ""}`
       );
-    }
-  }, [createSearchParam, name, navigate, roomNameParam]);
-
-  // check if room exists, but only if '?create' is not true
-  useEffect(() => {
-    if (stopped) {
+      setIsChecking(false);
       return;
     }
-    if (roomNameParam && createSearchParam !== "true") {
-      socket.emit("checkIfRoomExists", roomNameParam, (exists: boolean) => {
-        if (!exists) {
+  }, [name, navigate, roomNameParam, createSearchParam]);
+
+  useEffect(() => {
+    async function roomAndUsernameCheck(roomName: string, name: string) {
+      setDisplayMessage("checking if room exists...");
+      const exists = await new Promise((resolve) => {
+        socket.emit("checkIfRoomExists", roomName, (exists: boolean) => {
           console.log("exists", exists);
-          stopped = true;
-          navigate("/", {
-            state: {
-              message: `Seems like room '${decodeURIComponent(
-                roomNameParam
-              )}' doesnt exist, check if your link is valid.`,
-            },
-          });
-        }
+          setTimeout(() => {
+            resolve(exists);
+          }, 1000);
+          // resolve(exists);
+        });
       });
-    }
-  }, [createSearchParam, roomNameParam, navigate]);
 
-  // check if user with same username is in the room
-  /* TODO: could be same name and same socket.id (in case of client js navigation socket connection does not drop???) */
-  useEffect(() => {
-    console.log("here");
-    if (stopped) {
-      return;
-    }
-    socket.emit("checkUser", name, roomNameParam, (error?: string) => {
-      if (error) {
-        console.log("error", error);
-        stopped = true;
-        navigate(`/join?room=${roomNameParam}`, {
+      setIsChecking(true);
+      if (!exists && createSearchParam !== "true") {
+        navigate("/", {
           state: {
-            message: error,
+            message: `Seems like room '${decodeURIComponent(
+              roomNameParam as string
+            )}' doesnt exist, check if your link is valid.`,
           },
         });
       }
-    });
-  }, [name, navigate, roomNameParam]);
 
-  if (stopped) return <div>stopped</div>;
+      setDisplayMessage("checking if username is available...");
+      const taken = await new Promise((resolve) => {
+        socket.emit("checkUser", name, roomName, (taken: boolean) => {
+          setTimeout(() => {
+            resolve(taken);
+          }, 1000);
+          // resolve(taken);
+        });
+      });
+
+      if (taken) {
+        navigate(`/join?room=${roomName}`, {
+          state: {
+            message: "Seems like your username is taken, please change it",
+          },
+        });
+      }
+      setIsChecking(false);
+    }
+
+    if (roomNameParam != undefined && name != undefined) {
+      roomAndUsernameCheck(roomNameParam, name);
+    }
+  }, [createSearchParam, roomNameParam, navigate, name]);
+
+  return <div>{isChecking ? displayMessage : "room"}</div>;
 
   return (
     <Room

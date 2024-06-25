@@ -38,12 +38,13 @@ export default function RoomEnter() {
       navigate(
         `/join?room=${roomNameParam}${createSearchParam ? "&create=true" : ""}`
       );
-      setIsChecking(false);
       return;
     }
+    setIsChecking(false);
   }, [name, navigate, roomNameParam, createSearchParam]);
 
   useEffect(() => {
+    setIsChecking(true);
     async function roomAndUsernameCheck(roomName: string, name: string) {
       setDisplayMessage("checking if room exists...");
       const exists = await new Promise((resolve) => {
@@ -56,7 +57,6 @@ export default function RoomEnter() {
         });
       });
 
-      setIsChecking(true);
       if (!exists && createSearchParam !== "true") {
         navigate("/", {
           state: {
@@ -65,6 +65,7 @@ export default function RoomEnter() {
             )}' doesnt exist, check if your link is valid.`,
           },
         });
+        return;
       }
 
       setDisplayMessage("checking if username is available...");
@@ -80,9 +81,11 @@ export default function RoomEnter() {
       if (taken) {
         navigate(`/join?room=${roomName}`, {
           state: {
-            message: "Seems like your username is taken, please change it",
+            message: `Seems like your username '${name}' is taken, please change it`,
+            canUseOldUsername: false,
           },
         });
+        return;
       }
       setIsChecking(false);
     }

@@ -12,9 +12,7 @@ export default function JoinNamePrompt() {
   const [nameValue, setNameValue] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const [locationMessage, setLocationMessage] = useState(
-    location.state?.message
-  );
+  const name = localStorage.getItem("name");
 
   const handleSubmit = () => {
     if (!nameValue || nameValue.trim() === "") {
@@ -35,8 +33,7 @@ export default function JoinNamePrompt() {
 
   return (
     <div>
-      <p>{locationMessage && locationMessage}</p>
-      <p>tell us your name before joining</p>
+      <p>{location.state?.message && location.state?.message}</p>
       <div>
         <input
           value={nameValue}
@@ -55,6 +52,24 @@ export default function JoinNamePrompt() {
         >
           proceed
         </button>
+        {name && location.state?.canUseOldUsername === true && (
+          <button
+            onClick={() => {
+              if (createSearchParam === "true") {
+                navigate(
+                  `/room/${roomSearchParam}?create=${createSearchParam}`,
+                  {
+                    replace: true,
+                  }
+                );
+              } else {
+                navigate(`/room/${roomSearchParam}`, { replace: true });
+              }
+            }}
+          >
+            use {name}
+          </button>
+        )}
         <p>{errorMessage}</p>
       </div>
     </div>

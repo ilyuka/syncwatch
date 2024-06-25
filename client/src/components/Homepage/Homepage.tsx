@@ -10,7 +10,12 @@ export default function Homepage() {
 
   const joinRoom = () => {
     const randomRoomURI = encodeURIComponent("abc");
-    navigate(`/join?room=${randomRoomURI}&create=true`);
+    navigate(`/join?room=${randomRoomURI}&create=true`, {
+      state: {
+        message: "Tell us your name before joining",
+        canUseOldUsername: true,
+      },
+    });
   };
 
   return (

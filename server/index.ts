@@ -12,6 +12,7 @@ import {
   getAllUsers,
   userExists,
   getActiveRoomsForSocket,
+  getRoomUsers,
 } from "./user";
 
 dotenv.config();
@@ -31,14 +32,21 @@ app.use(router);
 io.on("connection", (socket) => {
   console.log("user connected");
 
+  socket.on("disconnecting", () => {
+    console.log("user disconnectING ", socket.rooms);
+  });
   // JOIN, LEAVE, USER
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    console.log("user disconnected", socket.rooms);
     const rooms = getActiveRoomsForSocket(socket.id);
 
     removeUser(socket.id);
 
+    let name: null | string = null;
     rooms.forEach((user: User) => {
+      if (!name) {
+        name = user.name;
+      }
       console.log("emitting to", user.room);
       io.to(user.room).emit("getUsers", getAllUsers());
     });
@@ -53,17 +61,19 @@ io.on("connection", (socket) => {
 
     console.log("all users after adding", getAllUsers());
 
-    io.to(room).emit("getUsers", getAllUsers());
+    io.to(room).emit("getUsers", getRoomUsers(room));
 
+    io.to(room).emit("message", "admin", `${name} joined the room!`);
     socket.emit("message", "admin", "Welcome to the room!");
 
-    return callbackFn(getAllUsers());
+    return callbackFn(getRoomUsers(room));
   });
 
   socket.on("leave", (name, room) => {
     console.log("leaving", socket.id);
     removeUser(socket.id);
-    io.to(room).emit("getUsers", getAllUsers());
+    io.to(room).emit("getUsers", getRoomUsers(room));
+    io.to(room).emit("message", "admin", `${name} left the room!`);
   });
 
   socket.on("getUsers", (callbackFn) => {

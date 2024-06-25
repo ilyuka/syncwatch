@@ -23,6 +23,10 @@ const getAllUsers = () => {
   return users;
 };
 
+const getRoomUsers = (room: string) => {
+  return users.filter((user) => user.room === room);
+};
+
 const userExists = (name: string, room: string) => {
   console.log("n,r", name, room);
   name = name.trim().toLowerCase();
@@ -49,4 +53,5 @@ export {
   getAllUsers,
   userExists,
   getActiveRoomsForSocket,
+  getRoomUsers,
 };

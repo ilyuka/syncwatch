@@ -3,6 +3,8 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 import Room from "./Room";
 
+let didInit = false;
+
 export default function RoomEnter() {
   const navigate = useNavigate();
   const params = useParams();
@@ -33,18 +35,21 @@ export default function RoomEnter() {
       }
       return true;
     }
-    setIsChecking(true);
-    if (!hasCorrectParams(name, roomNameParam)) {
-      navigate(
-        `/join?room=${roomNameParam}${createSearchParam ? "&create=true" : ""}`
-      );
-      return;
+    if (!didInit) {
+      setIsChecking(true);
+      if (!hasCorrectParams(name, roomNameParam)) {
+        navigate(
+          `/join?room=${roomNameParam}${
+            createSearchParam ? "&create=true" : ""
+          }`
+        );
+        return;
+      }
+      setIsChecking(false);
     }
-    setIsChecking(false);
   }, [name, navigate, roomNameParam, createSearchParam]);
 
   useEffect(() => {
-    setIsChecking(true);
     async function roomAndUsernameCheck(roomName: string, name: string) {
       setDisplayMessage("checking if room exists...");
       const exists = await new Promise((resolve) => {
@@ -90,9 +95,13 @@ export default function RoomEnter() {
       setIsChecking(false);
     }
 
-    if (roomNameParam != undefined && name != undefined) {
-      roomAndUsernameCheck(roomNameParam, name);
+    if (!didInit) {
+      setIsChecking(true);
+      if (roomNameParam != undefined && name != undefined) {
+        roomAndUsernameCheck(roomNameParam, name);
+      }
     }
+    didInit = true;
   }, [createSearchParam, roomNameParam, navigate, name]);
 
   return <div>{isChecking ? displayMessage : "room"}</div>;

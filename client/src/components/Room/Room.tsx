@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Chat from "../Chat/Chat";
 
 let joined = false;
 
@@ -47,6 +48,7 @@ export default function Room({ socket, create, room, name }) {
           return <li>{user.name}</li>;
         })}
       </ul>
+      <Chat socket={socket} room={room} name={name}></Chat>
     </div>
   );
 }

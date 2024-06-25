@@ -30,8 +30,8 @@ app.use(router);
 
 io.on("connection", (socket) => {
   console.log("user connected");
-  io.emit("test", "hello");
 
+  // JOIN, LEAVE, USER
   socket.on("disconnect", () => {
     console.log("user disconnected");
     const rooms = getActiveRoomsForSocket(socket.id);
@@ -54,6 +54,8 @@ io.on("connection", (socket) => {
     console.log("all users after adding", getAllUsers());
 
     io.to(room).emit("getUsers", getAllUsers());
+
+    socket.emit("message", "admin", "Welcome to the room!");
 
     return callbackFn(getAllUsers());
   });
@@ -79,6 +81,12 @@ io.on("connection", (socket) => {
     console.log("all users", getAllUsers());
     const exists = userExists(name, room);
     return callback(exists);
+  });
+
+  // CHATTING
+  socket.on("message", (text, room, name) => {
+    console.log("sending", text, "from", name, "to room", room);
+    io.to(room).emit("message", name, text);
   });
 });
 

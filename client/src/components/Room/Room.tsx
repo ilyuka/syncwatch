@@ -45,7 +45,7 @@ export default function Room({ socket, create, room, name }) {
       <ul>
         all users
         {allUsers.map((user) => {
-          return <li>{user.name}</li>;
+          return <li key={user.name}>{user.name}</li>;
         })}
       </ul>
       <Chat socket={socket} room={room} name={name}></Chat>

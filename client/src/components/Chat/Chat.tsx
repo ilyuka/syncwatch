@@ -4,6 +4,7 @@ interface Message {
   //   id: string;
   name: string;
   text: string;
+  date: Date;
   // color?
 }
 
@@ -22,9 +23,9 @@ export default function Chat({ socket, room, name }) {
     console.log("inside chat effect");
 
     socket.on("message", (name: string, text: string) => {
-      console.log("client socket message");
+      console.log("client recieved message", text);
       const newMessages = [...messages];
-      newMessages.push({ name, text });
+      newMessages.push({ name, text, date: new Date() });
       setMessages(newMessages);
       setInputValue("");
     });
@@ -35,7 +36,7 @@ export default function Chat({ socket, room, name }) {
       <div>
         {messages.map((msg) => {
           return (
-            <p key={`${msg.name + msg.text}`}>
+            <p key={`${msg.date + msg.name + msg.text}`}>
               {msg.name}: {msg.text}
             </p>
           );

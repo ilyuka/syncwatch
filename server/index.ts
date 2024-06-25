@@ -32,23 +32,25 @@ app.use(router);
 io.on("connection", (socket) => {
   console.log("user connected");
 
+  // JOIN, LEAVE, USER
   socket.on("disconnecting", () => {
     console.log("user disconnectING ", socket.rooms);
-  });
-  // JOIN, LEAVE, USER
-  socket.on("disconnect", () => {
-    console.log("user disconnected", socket.rooms);
-    const rooms = getActiveRoomsForSocket(socket.id);
 
-    removeUser(socket.id);
+    // only the room that was left will be in the array
+    const roomsLeft = [...socket.rooms].filter((id) => id !== socket.id);
 
-    let name: null | string = null;
-    rooms.forEach((user: User) => {
-      if (!name) {
-        name = user.name;
+    const removed = removeUser(socket.id);
+
+    roomsLeft.forEach((roomName) => {
+      io.to(roomName).emit("getUsers", getRoomUsers(roomName));
+
+      if (removed) {
+        io.to(roomName).emit(
+          "message",
+          "admin",
+          `${removed[0].name} left the room`
+        );
       }
-      console.log("emitting to", user.room);
-      io.to(user.room).emit("getUsers", getAllUsers());
     });
   });
 

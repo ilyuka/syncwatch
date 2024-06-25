@@ -35,7 +35,7 @@ export default function Chat({ socket, room, name }) {
       <div>
         {messages.map((msg) => {
           return (
-            <p>
+            <p key={`${msg.name + msg.text}`}>
               {msg.name}: {msg.text}
             </p>
           );

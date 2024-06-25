@@ -68,7 +68,7 @@ io.on("connection", (socket) => {
     io.to(room).emit("message", "admin", `${name} joined the room!`);
     socket.emit("message", "admin", "Welcome to the room!");
 
-    return callbackFn(getRoomUsers(room));
+    return callbackFn;
   });
 
   socket.on("leave", (name, room) => {

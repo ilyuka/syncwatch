@@ -1,54 +1,28 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import Chat from "../Chat/Chat";
+import MemoedUsers from "../Users/Users";
 
-let joined = false;
-
-export default function Room({ socket, create, room, name }) {
+const MemoedRoom = memo(function Room({ socket, create, room, name }) {
   console.log("room mounted");
-  const [allUsers, setAllUsers] = useState([]);
-
-  const updateUsers = (allUsers) => {
-    console.log("client recieved getUsers", allUsers);
-    setAllUsers(allUsers);
-  };
 
   useEffect(() => {
-    console.log("enter");
-
-    if (!joined) {
-      joined = true;
-
-      socket.on("getUsers", updateUsers);
-
-      socket.emit("join", name, room, (allUsers) => {
-        // TODO: do i need this callback?
-      });
-    }
-
-    // socket.on("join", () => {
-    //   // TODO: in chat display `${username} joined`
-    // });
+    socket.emit("join", name, room, () => {});
 
     return () => {
-      if (joined) {
-        joined = false;
-        socket.emit("leave", name, room);
-        // socket.off("getUsers", updateUsers);
-      }
-      console.log("leave");
+      socket.emit("leave", name, room);
+      console.log("unmount");
     };
-  }, [socket, room, name]);
+  }, [name, room, socket]);
 
   return (
     <div>
-      <h1>room {room}</h1>
-      <ul>
-        all users
-        {allUsers.map((user) => {
-          return <li key={user.name}>{user.name}</li>;
-        })}
-      </ul>
-      <Chat socket={socket} room={room} name={name}></Chat>
+      <>
+        <h1>room {room}</h1>
+        <MemoedUsers socket={socket}></MemoedUsers>
+        <Chat socket={socket} room={room} name={name}></Chat>
+      </>
     </div>
   );
-}
+});
+
+export default MemoedRoom;

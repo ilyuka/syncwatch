@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 import Room from "./Room";
@@ -15,7 +15,7 @@ export default function RoomEnter() {
 
   const name = localStorage.getItem("name");
 
-  const [isChecking, setIsChecking] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
 
   const [displayMessage, setDisplayMessage] =
     useState<string>("please wait...");
@@ -36,7 +36,6 @@ export default function RoomEnter() {
       return true;
     }
     if (!didInit) {
-      setIsChecking(true);
       if (!hasCorrectParams(name, roomNameParam)) {
         navigate(
           `/join?room=${roomNameParam}${
@@ -46,7 +45,6 @@ export default function RoomEnter() {
         );
         return;
       }
-      setIsChecking(false);
     }
   }, [name, navigate, roomNameParam, createSearchParam]);
 
@@ -101,7 +99,6 @@ export default function RoomEnter() {
     }
 
     if (!didInit) {
-      setIsChecking(true);
       if (roomNameParam != undefined && name != undefined) {
         roomAndUsernameCheck(roomNameParam, name);
       }

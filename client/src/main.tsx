@@ -36,21 +36,6 @@ const router = createBrowserRouter([
   {
     path: "/join",
     element: <Join></Join>,
-    loader: ({ request }) => {
-      const url = new URL(request.url);
-      const name = localStorage.getItem("name");
-      const create = url.searchParams.get("create");
-      const room = url.searchParams.get("room");
-
-      // if (name != null && name !== "") {
-      //   if (create === "true") {
-      //     return redirect(`/room/${room}?create=true`);
-      //   } else {
-      //     return redirect(`/room/${room}`);
-      //   }
-      // }
-      return null;
-    },
   },
 ]);
 

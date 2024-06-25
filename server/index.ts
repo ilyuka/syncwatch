@@ -5,7 +5,14 @@ import cors from "cors";
 import socketIO from "socket.io";
 import { router } from "./router";
 import { getActiveRooms } from "./room";
-import { addUser, removeUser, getAllUsers, userExists } from "./user";
+import {
+  type User,
+  addUser,
+  removeUser,
+  getAllUsers,
+  userExists,
+  getActiveRoomsForSocket,
+} from "./user";
 
 dotenv.config();
 
@@ -27,13 +34,38 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("user disconnected");
+    const rooms = getActiveRoomsForSocket(socket.id);
+
     removeUser(socket.id);
+
+    rooms.forEach((user: User) => {
+      console.log("emitting to", user.room);
+      io.to(user.room).emit("getUsers", getAllUsers());
+    });
   });
 
-  socket.on("join", (name, room) => {
+  socket.on("join", (name, room, callbackFn) => {
+    console.log("all users before adding", getAllUsers());
+    console.log("adding new user", socket.id, name, room);
+
     const { user } = addUser({ id: socket.id, name, room });
-    console.log(getAllUsers());
     socket.join(room);
+
+    console.log("all users after adding", getAllUsers());
+
+    io.to(room).emit("getUsers", getAllUsers());
+
+    return callbackFn(getAllUsers());
+  });
+
+  socket.on("leave", (name, room) => {
+    console.log("leaving", socket.id);
+    removeUser(socket.id);
+    io.to(room).emit("getUsers", getAllUsers());
+  });
+
+  socket.on("getUsers", (callbackFn) => {
+    return callbackFn(getAllUsers());
   });
 
   socket.on("checkIfRoomExists", (roomName, callbackFn) => {
@@ -43,6 +75,8 @@ io.on("connection", (socket) => {
   });
 
   socket.on("checkUser", (name, room, callback) => {
+    console.log("checking if user exists");
+    console.log("all users", getAllUsers());
     const exists = userExists(name, room);
     return callback(exists);
   });

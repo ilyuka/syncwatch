@@ -1,10 +1,10 @@
 interface User {
-  id: String;
-  name: String;
-  room: String;
+  id: string;
+  name: string;
+  room: string;
 }
 
-const users: any = [];
+const users: User[] = [];
 
 const addUser = ({ id, name, room }: User) => {
   const user = { id, name, room };
@@ -38,4 +38,15 @@ const userExists = (name: string, room: string) => {
   return false;
 };
 
-export { addUser, removeUser, getAllUsers, userExists };
+const getActiveRoomsForSocket = (id: string) => {
+  return users.filter((user) => user.id === id);
+};
+
+export {
+  type User,
+  addUser,
+  removeUser,
+  getAllUsers,
+  userExists,
+  getActiveRoomsForSocket,
+};

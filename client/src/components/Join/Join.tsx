@@ -21,6 +21,7 @@ export default function Join() {
     if (!location.state) {
       navigate("/", {
         state: { message: "Please check if your link is valid" },
+        replace: true,
       });
       return;
     }

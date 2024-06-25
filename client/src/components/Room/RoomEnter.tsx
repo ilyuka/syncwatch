@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { socket } from "../../utils/socketInit";
 import Room from "./Room";
@@ -41,7 +41,8 @@ export default function RoomEnter() {
         navigate(
           `/join?room=${roomNameParam}${
             createSearchParam ? "&create=true" : ""
-          }`
+          }`,
+          { state: { message: "Please provide your username" } }
         );
         return;
       }
@@ -62,15 +63,19 @@ export default function RoomEnter() {
         });
       });
 
-      if (!exists && createSearchParam !== "true") {
-        navigate("/", {
-          state: {
-            message: `Seems like room '${decodeURIComponent(
-              roomNameParam as string
-            )}' doesnt exist, check if your link is valid.`,
-          },
-        });
-        return;
+      // TODO: if exists and 'create' === true (randomly generated existing roomName)
+
+      if (!exists) {
+        if (createSearchParam !== "true") {
+          navigate("/", {
+            state: {
+              message: `Seems like room '${decodeURIComponent(
+                roomNameParam as string
+              )}' doesnt exist, check if your link is valid.`,
+            },
+          });
+          return;
+        }
       }
 
       setDisplayMessage("checking if username is available...");
@@ -104,14 +109,19 @@ export default function RoomEnter() {
     didInit = true;
   }, [createSearchParam, roomNameParam, navigate, name]);
 
-  return <div>{isChecking ? displayMessage : "room"}</div>;
-
-  return (
-    <Room
-      socket={socket}
-      create={createSearchParam}
-      room={roomNameParam}
-      name={name}
-    ></Room>
-  );
+  if (isChecking) {
+    return <div>{displayMessage}</div>;
+  }
+  if (didInit === true) {
+    return (
+      <div>
+        <Room
+          socket={socket}
+          create={createSearchParam}
+          room={roomNameParam}
+          name={name}
+        ></Room>
+      </div>
+    );
+  }
 }
